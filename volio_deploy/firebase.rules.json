@@ -1,0 +1,72 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "users": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+    "orders": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "expenses": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "products": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "inventory": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "inventoryMovements": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "customers": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "suppliers": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "payments": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "accounts": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "campaigns": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "tasks": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "receivables": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "payables": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "activityLogs": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+    "settings": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    }
+  }
+}
