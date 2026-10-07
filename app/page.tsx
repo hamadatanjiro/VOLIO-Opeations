@@ -1,4 +1,5 @@
 // @ts-nocheck
+// VOLIO Vercel build refresh: TypeScript checking is intentionally disabled for this client page.
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
