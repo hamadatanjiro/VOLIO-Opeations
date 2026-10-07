@@ -126,11 +126,12 @@ function App({ user, tab, setTab, data }: { user: User; tab: Tab; setTab: (t: Ta
   const net = gross - expenseTotal;
 
   const title = nav.flatMap(g => g.items).find(x => x.id === tab)?.label || "Dashboard";
-  const subtitle = {
+  const subtitle: Partial<Record<Tab, string>> = {
     dashboard: "Your business at a glance.", expenses: "Every outgoing, tracked cleanly.",
     orders: "Sales and order profitability.", inventory: "Stock, cost and margin control.",
     reports: "A simple view of the numbers that matter."
-  }[tab] || "Manage your VOLIO workspace.";
+  };
+  const subtitleText = subtitle[tab] || "Manage your VOLIO workspace.";
 
   return <div className="app-shell">
     <aside className="sidebar">
@@ -144,7 +145,7 @@ function App({ user, tab, setTab, data }: { user: User; tab: Tab; setTab: (t: Ta
     </aside>
 
     <main className="main">
-      <header className="topbar"><div><div className="crumb">VOLIO / {title.toUpperCase()}</div><h2>{title}</h2><p>{subtitle}</p></div><div className="top-actions"><span className="live"><i/> Live database</span><button className="icon-btn">⌕</button><button className="profile" onClick={() => setTab("settings")}>{(user.email?.[0] || "V").toUpperCase()}</button></div></header>
+      <header className="topbar"><div><div className="crumb">VOLIO / {title.toUpperCase()}</div><h2>{title}</h2><p>{subtitleText}</p></div><div className="top-actions"><span className="live"><i/> Live database</span><button className="icon-btn">⌕</button><button className="profile" onClick={() => setTab("settings")}>{(user.email?.[0] || "V").toUpperCase()}</button></div></header>
       <div className="content">
         {tab === "dashboard" && <Dashboard revenue={revenue} gross={gross} expenses={expenseTotal} net={net} orders={orders} expensesList={expenses} products={products} tasks={tasks} setTab={setTab}/>}
         {tab === "expenses" && <Expenses expenses={expenses} orders={orders} user={user}/>}
