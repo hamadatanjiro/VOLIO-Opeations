@@ -112,3 +112,41 @@ tfoot td{background:#f7f8fc;border-top:2px solid var(--line);font-weight:800;col
   .main{margin-left:80px}.content{padding:20px}
   .topbar{padding:20px}
 }
+
+
+/* Final responsive + theme polish */
+html,body{overflow-x:hidden}
+.main{min-width:0}
+.active-toggle{width:30px;height:30px;border-radius:8px;padding:0;line-height:1;font-size:13px;box-shadow:none}
+.active-toggle.is-active{background:#13b981;color:#fff;border-color:#13b981}
+.active-toggle.is-inactive{background:#ef5b67;color:#fff;border-color:#ef5b67}
+.active-toggle:hover{transform:translateY(-1px);filter:brightness(.97)}
+.theme-dark .row-actions,.theme-dark th:last-child{background:var(--panel)}
+.theme-dark .form label{color:#c4cad5}
+.theme-dark .secondary{color:#e3e7ef}
+.theme-dark .panel-head button,.theme-dark .edit-link{color:#a99cff}
+.theme-dark .danger-link{color:#ff7b85}
+.theme-dark .category-row{border-color:var(--line)}
+.theme-dark .close{background:#202632;color:#e3e7ef}
+.theme-dark .pnl-row{border-color:var(--line)}
+.theme-dark .toolbar select{color:var(--ink)}
+@media(max-width:650px){
+  .topbar>div:first-child{min-width:0}
+  .topbar h2,.topbar p{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .top-actions .live{display:none}
+  .top-actions{flex-shrink:0}
+  .top-actions .profile{display:grid}
+  .content{max-width:100vw}
+  .page-hero,.health-banner,.expense-hero{width:100%}
+  .page-hero h3,.health-banner h3,.expense-hero h3{font-size:19px}
+  .page-hero p,.health-banner p,.expense-hero p{max-width:100%}
+  .toolbar{width:100%}
+  .toolbar .search{min-width:0}
+  .toolbar select{min-width:120px}
+  .row-actions{min-width:108px;width:108px}
+  th:last-child{min-width:108px;width:108px}
+  .modal-actions{flex-wrap:wrap}
+  .modal-actions button{flex:1;min-width:120px}
+  .mobile-nav button{touch-action:manipulation}
+  .active-toggle{width:32px;height:32px}
+}
