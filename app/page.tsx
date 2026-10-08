@@ -151,7 +151,7 @@ function App({ user, tab, setTab, data }: { user: User; tab: Tab; setTab: (t: Ta
     <main className="main">
       <header className="topbar"><div><div className="crumb">VOLIO / {title.toUpperCase()}</div><h2>{title}</h2><p>{subtitleText}</p></div><div className="top-actions"><span className="live"><i/> Live database</span><button className="icon-btn">⌕</button><button className="profile" onClick={() => setTab("settings")}>{(user.email?.[0] || "V").toUpperCase()}</button></div></header>
       <div className="content">
-        {tab === "dashboard" && <Dashboard revenue={revenue} gross={gross} expenses={expenseTotal} net={net} orders={orders} expensesList={expenses} products={products} tasks={tasks} setTab={setTab} categories={expenseCategories}/>}
+        {tab === "dashboard" && <Dashboard revenue={revenue} cogs={cogs} expenses={expenseTotal} net={net} orders={orders} expensesList={expenses} products={products} tasks={tasks} setTab={setTab} categories={expenseCategories}/>}
         {tab === "expenses" && <Expenses expenses={expenses} orders={orders} user={user} categories={expenseCategories} categoryRecords={data.expenseCategories || []}/>}
         {tab === "orders" && <Orders orders={orders} customers={customers} user={user}/>}
         {tab === "inventory" && <Inventory products={products} user={user}/>}
@@ -171,13 +171,13 @@ function App({ user, tab, setTab, data }: { user: User; tab: Tab; setTab: (t: Ta
   </div>;
 }
 
-function Dashboard({ revenue,gross,expenses,net,orders,expensesList,products,tasks,setTab,categories }: any) {
+function Dashboard({ revenue,cogs,expenses,net,orders,expensesList,products,tasks,setTab,categories }: any) {
   const recent = [...orders].sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt))).slice(0,5);
   return <div className="stack">
     <div className="health-banner"><div><span className="pill green">● Healthy</span><h3>VOLIO is under control.</h3><p>Keep expenses tight and turn every confirmed order into measurable profit.</p></div><button type="button" className="secondary" onClick={()=>setTab("expenses")}>Review expenses →</button></div>
     <div className="metric-grid">
       <Metric label="Revenue" value={money(revenue)} sub={`${orders.length} orders`} icon="↗" tone="purple"/>
-      <Metric label="Gross profit" value={money(gross)} sub="Before operating expenses" icon="◆" tone="blue"/>
+      <Metric label="Cost of sales" value={`− ${money(cogs)}`} sub="Cost of watches sold" icon="↓" tone="blue"/>
       <Metric label="Expenses" value={money(expenses)} sub={`${expensesList.length} entries`} icon="↘" tone="orange"/>
       <Metric label="Net profit" value={money(net)} sub={net >= 0 ? "Positive operating result" : "Needs attention"} icon="✦" tone={net >= 0 ? "green" : "red"}/>
     </div>
