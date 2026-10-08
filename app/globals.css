@@ -40,3 +40,24 @@ th:last-child{width:118px;min-width:118px;position:sticky;right:0;background:#ff
 .edit-link,.danger-link{border:0;background:transparent;padding:6px 7px;border-radius:7px;font-size:10px;font-weight:800;cursor:pointer;white-space:nowrap}
 .edit-link{color:#5f4bdc}.edit-link:hover{background:#eeeaff}
 .danger-link{color:#df5963}.danger-link:hover{background:#fff0f1}
+
+/* Customer accordion */
+.customer-panel{padding:18px}
+.customer-list{display:flex;flex-direction:column;gap:8px}
+.customer-card{border:1px solid #e8eaf1;border-radius:12px;background:#fff;overflow:hidden}
+.customer-row{width:100%;display:flex;align-items:center;gap:14px;border:0;background:#fff;padding:16px 18px;text-align:left;cursor:pointer}
+.customer-row:hover{background:#fafaff}
+.customer-chevron{width:24px;height:24px;border-radius:7px;background:#f0edff;color:#654df0;display:grid;place-items:center;font-weight:900;font-size:18px;flex:none}
+.customer-main{display:flex;flex-direction:column;gap:4px;flex:1;min-width:0}
+.customer-main b{font-size:13px;color:#1d2337}
+.customer-main small{font-size:10px;color:#8a90a5}
+.customer-count{min-width:28px;height:28px;border-radius:8px;background:#f4f2ff;color:#6049dc;display:grid;place-items:center;font-size:11px;font-weight:800}
+.customer-details{border-top:1px solid #eceef4;background:#fafbfe;padding:0 18px 16px}
+.customer-orders{border:1px solid #e4e7ef;border-radius:10px;overflow:hidden;background:#fff;margin-top:14px}
+.customer-order-head,.customer-order{display:grid;grid-template-columns:1.1fr 1.6fr 1fr 1fr 1fr;align-items:center;gap:12px;padding:11px 14px;font-size:10px}
+.customer-order-head{background:#f6f7fb;color:#858ca2;text-transform:uppercase;letter-spacing:.08em;font-weight:800}
+.customer-order{border-top:1px solid #eef0f5;color:#4d5368}
+.customer-order span:last-child{font-weight:800}
+.customer-order .status{font-size:9px}
+.customer-empty{padding:18px 4px;color:#9096a9;font-size:11px}
+.customer-actions{display:flex;justify-content:flex-end;gap:8px;padding-top:12px}
