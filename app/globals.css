@@ -61,3 +61,6 @@ th:last-child{width:118px;min-width:118px;position:sticky;right:0;background:#ff
 .customer-order .status{font-size:9px}
 .customer-empty{padding:18px 4px;color:#9096a9;font-size:11px}
 .customer-actions{display:flex;justify-content:flex-end;gap:8px;padding-top:12px}
+
+
+tfoot td{background:#f7f8fc;border-top:2px solid var(--line);font-weight:800;color:#20232c}tfoot td b{font-size:10px}tfoot .status{background:#eeeaff;color:#6252dd}
