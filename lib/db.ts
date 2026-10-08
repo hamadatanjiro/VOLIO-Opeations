@@ -13,10 +13,11 @@ import {
 
 export type RecordMap = Record<string, any>;
 
-export function subscribe(path: string, callback: (data: RecordMap) => void) {
+export function subscribe(path: string, callback: (data: RecordMap) => void, onError?: (error: Error) => void) {
   const r = ref(db, path);
   const handler = (snap: DataSnapshot) => callback((snap.val() || {}) as RecordMap);
-  onValue(r, handler);
+  const errorHandler = (error: Error) => onError?.(error);
+  onValue(r, handler, errorHandler);
   return () => off(r, "value", handler);
 }
 
