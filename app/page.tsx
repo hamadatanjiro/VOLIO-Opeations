@@ -127,7 +127,10 @@ function App({ user, tab, setTab, data }: { user: User; tab: Tab; setTab: (t: Ta
   const cogs = orders.reduce((s, x) => s + Number(x.cogs || 0), 0);
   const gross = revenue - cogs;
   const expenseTotal = expenses.reduce((s, x) => s + Number(x.amount || 0), 0);
-  const net = gross - expenseTotal;
+  const orderDirectExpenses = orders.reduce((s, x) => s + Number(x.expenses || 0), 0);
+  const marketingSpend = (data.campaigns || []).reduce((s, x) => s + Number(x.spend || 0), 0);
+  const operatingExpenses = expenseTotal + orderDirectExpenses + marketingSpend;
+  const net = gross - operatingExpenses;
 
   const title = nav.flatMap(g => g.items).find(x => x.id === tab)?.label || "Dashboard";
   const subtitle: Partial<Record<Tab, string>> = {
@@ -151,14 +154,14 @@ function App({ user, tab, setTab, data }: { user: User; tab: Tab; setTab: (t: Ta
     <main className="main">
       <header className="topbar"><div><div className="crumb">VOLIO / {title.toUpperCase()}</div><h2>{title}</h2><p>{subtitleText}</p></div><div className="top-actions"><span className="live"><i/> Live database</span><button className="icon-btn">⌕</button><button className="profile" onClick={() => setTab("settings")}>{(user.email?.[0] || "V").toUpperCase()}</button></div></header>
       <div className="content">
-        {tab === "dashboard" && <Dashboard revenue={revenue} cogs={cogs} expenses={expenseTotal} net={net} orders={orders} expensesList={expenses} products={products} tasks={tasks} setTab={setTab} categories={expenseCategories}/>}
+        {tab === "dashboard" && <Dashboard revenue={revenue} cogs={cogs} expenses={operatingExpenses} net={net} orders={orders} expensesList={expenses} products={products} tasks={tasks} setTab={setTab} categories={expenseCategories}/>}
         {tab === "expenses" && <Expenses expenses={expenses} orders={orders} user={user} categories={expenseCategories} categoryRecords={data.expenseCategories || []}/>}
         {tab === "orders" && <Orders orders={orders} customers={customers} user={user}/>}
         {tab === "inventory" && <Inventory products={products} user={user}/>}
         {tab === "customers" && <Customers items={customers} orders={orders} user={user}/>}
         {tab === "suppliers" && <SimpleCrud title="Suppliers" path="suppliers" items={suppliers} user={user} fields={["name","contact","phone","notes"]} /> }
         {tab === "tasks" && <Tasks items={tasks} user={user}/>}
-        {tab === "reports" && <Reports revenue={revenue} cogs={cogs} gross={gross} expenses={expenseTotal} net={net}/>}
+        {tab === "reports" && <Reports revenue={revenue} cogs={cogs} gross={gross} expenses={operatingExpenses} net={net}/>}
         {tab === "cash" && <InfoPage title="Cash Flow" text="Track cash movement by account as payments and expenses are connected." cards={[["Inflow", money(revenue)],["Outflow",money(expenseTotal)],["Net movement",money(revenue-expenseTotal)]]}/>}
         {tab === "receivables" && <InfoPage title="Accounts Receivable" text="Keep outstanding customer balances visible and tied to orders." cards={[["Open orders",String(orders.length)],["Potential receivable",money(orders.filter(o=>o.status!=="Paid").reduce((s,o)=>s+Number(o.sale||0),0))]]}/>}
         {tab === "payables" && <InfoPage title="Accounts Payable" text="Supplier and operating bills can be connected here as the workflow grows." cards={[["Suppliers",String(suppliers.length)],["Expenses recorded",money(expenseTotal)]]}/>}
