@@ -161,7 +161,7 @@ function App({ user, tab, setTab, data }: { user: User; tab: Tab; setTab: (t: Ta
   const title = nav.flatMap(g => g.items).find(x => x.id === tab)?.label || "Dashboard";
   const subtitle: Partial<Record<Tab, string>> = {
     dashboard: "Your business at a glance.", expenses: "Every outgoing, tracked cleanly.",
-    orders: "Sales and order profitability.", inventory: "Your watch models and their COGS."
+    orders: "Sales and order profitability.", inventory: "Your watch models and their COGS.",
     reports: "A simple view of the numbers that matter."
   };
   const subtitleText = subtitle[tab] || "Manage your VOLIO workspace.";
