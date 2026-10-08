@@ -5,8 +5,11 @@
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import {
+  browserLocalPersistence,
+  browserSessionPersistence,
   createUserWithEmailAndPassword,
   onAuthStateChanged,
+  setPersistence,
   signInWithEmailAndPassword,
   signOut,
   User
@@ -89,13 +92,36 @@ function Login() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
+  function authError(err: any) {
+    const code = String(err?.code || "").replace("auth/", "");
+    const messages: Record<string, string> = {
+      "invalid-credential": "Email or password is incorrect.",
+      "invalid-login-credentials": "Email or password is incorrect.",
+      "user-not-found": "No VOLIO account exists with this email.",
+      "wrong-password": "Email or password is incorrect.",
+      "email-already-in-use": "An account already exists with this email. Switch to Sign in.",
+      "weak-password": "Password must be at least 6 characters.",
+      "invalid-email": "Please enter a valid email address.",
+      "operation-not-allowed": "Email/password sign-in is disabled in Firebase Authentication.",
+      "network-request-failed": "Firebase could not connect. Check the internet connection or browser network settings.",
+      "too-many-requests": "Too many attempts. Wait a moment and try again.",
+      "unauthorized-domain": "This website domain is not authorized by Firebase Authentication.",
+      "api-key-not-valid": "The Firebase API key is not valid for this website.",
+      "app-not-authorized": "This Firebase app is not authorized for this website.",
+      "web-storage-unsupported": "This browser is blocking the storage Firebase Authentication needs. Try another browser or allow site storage."
+    };
+    return (messages[code] || err?.message?.replace("Firebase: ", "") || "Unable to authenticate.") + (code ? "\\n\\nFirebase error: auth/" + code : "");
+  }
+
   async function submit(e: FormEvent) {
     e.preventDefault(); setBusy(true); setError("");
     try {
-      if (mode === "login") await signInWithEmailAndPassword(auth, email, password);
-      else await createUserWithEmailAndPassword(auth, email, password);
+      try { await setPersistence(auth, browserLocalPersistence); }
+      catch { await setPersistence(auth, browserSessionPersistence); }
+      if (mode === "login") await signInWithEmailAndPassword(auth, email.trim(), password);
+      else await createUserWithEmailAndPassword(auth, email.trim(), password);
     } catch (err: any) {
-      setError(err?.message?.replace("Firebase: ", "") || "Unable to sign in.");
+      setError(authError(err));
     } finally { setBusy(false); }
   }
 
@@ -109,7 +135,7 @@ function Login() {
       <form onSubmit={submit} className="form">
         <label>Email<input value={email} onChange={e => setEmail(e.target.value)} type="email" required placeholder="you@volio.com"/></label>
         <label>Password<input value={password} onChange={e => setPassword(e.target.value)} type="password" required minLength={6} placeholder="••••••••"/></label>
-        {error && <div className="error">{error}</div>}
+        {error && <div className="error" style={{whiteSpace:"pre-line"}}>{error}</div>}
         <button className="primary wide" disabled={busy}>{busy ? "Connecting…" : mode === "login" ? "Sign in" : "Create account"}</button>
       </form>
       <button className="text-button" onClick={() => setMode(mode === "login" ? "signup" : "login")}>
@@ -290,7 +316,7 @@ function Marketing({campaigns,user,orders,adsExpenses}:{campaigns:any[],user:Use
 function CampaignModal({user,existing,onClose}:{user:User,existing?:any,onClose:()=>void}){const [f,setF]=useState({date:existing?.date??today(),name:existing?.name??"",platform:existing?.platform??"Meta Ads",spend:existing?.spend??"",dms:existing?.dms??"",confirmedOrders:existing?.confirmedOrders??""}),[busy,setBusy]=useState(false),[error,setError]=useState("");const spend=Number(f.spend||0),dms=Number(f.dms||0),ord=Number(f.confirmedOrders||0);async function save(e:FormEvent){e.preventDefault();setBusy(true);setError("");try{const payload={...f,spend,dms,confirmedOrders:ord,createdBy:user.uid};if(existing?.id)await updateRecord("campaigns",existing.id,payload);else await createRecord("campaigns",payload);onClose()}catch(err:any){setError(err?.message||"Could not save campaign.")}finally{setBusy(false)}}return <Modal title={existing?"Edit marketing campaign":"Add marketing campaign"} onClose={onClose}><form onSubmit={save} className="form two-form"><label>Date<input type="date" required value={f.date} onChange={e=>setF({...f,date:e.target.value})}/></label><label>Platform<select value={f.platform} onChange={e=>setF({...f,platform:e.target.value})}><option>Meta Ads</option><option>Instagram</option><option>Facebook</option><option>TikTok</option><option>Google Ads</option><option>Other</option></select></label><label className="full">Campaign name<input required value={f.name} onChange={e=>setF({...f,name:e.target.value})}/></label><label>Money spent (£)<input required min="0" step="0.01" type="number" value={f.spend} onChange={e=>setF({...f,spend:e.target.value})}/></label><label>DMs received<input required min="0" type="number" value={f.dms} onChange={e=>setF({...f,dms:e.target.value})}/></label><label>Confirmed orders<input required min="0" type="number" value={f.confirmedOrders} onChange={e=>setF({...f,confirmedOrders:e.target.value})}/></label>{error&&<div className="error">{error}</div>}<div className="modal-actions"><button type="button" className="secondary" onClick={onClose}>Cancel</button><button className="primary" disabled={busy}>{busy?"Saving…":existing?"Save changes":"Save campaign"}</button></div></form></Modal>}
 function Health({revenue,gross,expenses,net,products,tasks}:{revenue:number,gross:number,expenses:number,net:number,products:any[],tasks:any[]}){const checks=[["Profit positive",net>=0,net>=0?`Net profit is ${money(net)}`:"Net profit is negative"],["Expense control",gross===0?true:expenses/gross<0.5,`${gross?((expenses/gross)*100).toFixed(0):0}% of gross profit is currently in expenses`],["Stock watch",products.filter(p=>Number(p.stock)<2).length===0,`${products.filter(p=>Number(p.stock)<2).length} low-stock product(s)`],["Task queue",tasks.filter(t=>!t.done).length<8,true?`${tasks.filter(t=>!t.done).length} open task(s)`:""]];return <div className="stack"><div className="page-hero"><div><span className="eyebrow">BUSINESS HEALTH</span><h3>Know what needs attention.</h3><p>Simple signals from the numbers already in your workspace.</p></div></div><div className="health-grid">{checks.map(([name,ok,detail]:any)=><div className={`health-card ${ok?"ok":"warn"}`} key={name}><span>{ok?"✓":"!"}</span><div><b>{name}</b><p>{detail}</p></div></div>)}</div></div>}
 
-function Settings({user}:{user:User}){return <div className="stack"><div className="page-hero"><div><span className="eyebrow">SYSTEM</span><h3>Settings.</h3><p>Firebase-connected workspace configuration.</p></div></div><section className="panel settings"><div><span>Signed-in account</span><b>{user.email}</b><small>UID: {user.uid}</small></div><div><span>Database</span><b>Firebase Realtime Database</b><small>Live synchronization enabled</small></div><div><span>Hosting target</span><b>Vercel</b><small>Deploy the Next.js project from GitHub.</small></div><button className="danger-button" onClick={()=>signOut(auth)}>Sign out</button></section></div>}
+function Settings({user}:{user:User}){return <div className="stack"><div className="page-hero"><div><span className="eyebrow">SYSTEM</span><h3>Settings.</h3><p>Firebase-connected workspace configuration.</p></div></div><section className="panel settings"><div><span>Signed-in account</span><b>{user.email}</b><small>UID: {user.uid}</small></div><div><span>Database</span><b>Firebase Realtime Database</b><small>Live synchronization enabled</small></div><div><span>Hosting target</span><b>GitHub Pages</b><small>Live at hamadatanjiro.github.io/VOLIO-Opeations/</small></div><button className="danger-button" onClick={()=>signOut(auth)}>Sign out</button></section></div>}
 
 function Modal({title,onClose,children}:{title:string,onClose:()=>void,children:React.ReactNode}){return <div className="modal-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget)onClose()}}><div className="modal"><div className="modal-head"><div><span className="eyebrow">VOLIO</span><h3>{title}</h3></div><button className="close" onClick={onClose}>×</button></div>{children}</div></div>}
 
