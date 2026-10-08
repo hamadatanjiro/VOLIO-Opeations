@@ -32,3 +32,11 @@ button{pointer-events:auto;position:relative;z-index:2}
 .page-hero button,.expense-hero button,.health-banner button,.toolbar button{position:relative;z-index:5;pointer-events:auto}
 .modal-backdrop,.modal{pointer-events:auto}
 .modal button{pointer-events:auto}
+
+
+/* Row actions — always visible */
+.row-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;min-width:118px;width:118px;white-space:nowrap;position:sticky;right:0;background:#fff;z-index:3;box-shadow:-8px 0 14px rgba(29,35,55,.05)}
+th:last-child{width:118px;min-width:118px;position:sticky;right:0;background:#fff;z-index:4}
+.edit-link,.danger-link{border:0;background:transparent;padding:6px 7px;border-radius:7px;font-size:10px;font-weight:800;cursor:pointer;white-space:nowrap}
+.edit-link{color:#5f4bdc}.edit-link:hover{background:#eeeaff}
+.danger-link{color:#df5963}.danger-link:hover{background:#fff0f1}
