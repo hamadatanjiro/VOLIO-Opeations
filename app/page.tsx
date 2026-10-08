@@ -58,7 +58,8 @@ function values(map: any) {
   return Object.entries(map || {}).map(([id, value]) => ({ id, ...(value as any) }));
 }
 
-// VOLIO TASK DEPARTMENT UPDATE — force fresh production build\nexport default function Home() {
+// VOLIO TASK DEPARTMENT UPDATE — force fresh production build
+export default function Home() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<Tab>("dashboard");
