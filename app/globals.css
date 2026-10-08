@@ -64,3 +64,51 @@ th:last-child{width:118px;min-width:118px;position:sticky;right:0;background:#ff
 
 
 tfoot td{background:#f7f8fc;border-top:2px solid var(--line);font-weight:800;color:#20232c}tfoot td b{font-size:10px}tfoot .status{background:#eeeaff;color:#6252dd}
+
+/* VOLIO theme + mobile polish */
+.theme-dark{--bg:#0c0f15;--panel:#141820;--ink:#f4f6fb;--muted:#9aa3b4;--line:#252b37;--shadow:0 18px 50px rgba(0,0,0,.22)}
+.theme-dark .main,.theme-dark .topbar{background:var(--bg);color:var(--ink)}
+.theme-dark .topbar{border-color:var(--line)}
+.theme-dark .panel,.theme-dark .metric,.theme-dark .customer-card,.theme-dark .customer-row,.theme-dark .customer-orders,.theme-dark .modal,.theme-dark .secondary,.theme-dark .search,.theme-dark .form input,.theme-dark .form select,.theme-dark .toolbar select{background:var(--panel);color:var(--ink);border-color:var(--line)}
+.theme-dark td,.theme-dark .customer-order{color:#b5bdcc;border-color:var(--line)}
+.theme-dark td b,.theme-dark .panel-head h3,.theme-dark .metric strong,.theme-dark .chart-foot b,.theme-dark .customer-main b{color:var(--ink)}
+.theme-dark th,.theme-dark .muted,.theme-dark .metric span,.theme-dark .metric small,.theme-dark .topbar p,.theme-dark .crumb,.theme-dark .customer-main small{color:#8f99aa}
+.theme-dark .search input,.theme-dark .form input,.theme-dark .form select,.theme-dark .toolbar select{background:var(--panel);color:var(--ink)}
+.theme-dark .search input::placeholder,.theme-dark input::placeholder{color:#697384}
+.theme-dark tfoot td,.theme-dark .customer-order-head{background:#1a1f29;border-color:var(--line)}
+.theme-dark .status,.theme-dark .tag{background:#202632;color:#c3cad7}
+.theme-dark .customer-details{background:#10141b;border-color:var(--line)}
+.theme-dark .customer-chevron,.theme-dark .customer-count{background:#25213d;color:#a99cff}
+.theme-dark .icon-btn,.theme-dark .live{background:#171c25;color:#e7eaf1;border-color:var(--line)}
+.theme-dark .fake-chart,.theme-dark .category-row,.theme-dark .focus-list>div,.theme-dark .task-row{border-color:var(--line)}
+.theme-dark .donut-hole{background:var(--panel)}
+.theme-dark .pnl-row.total{background:#1a1f29}
+.theme-dark .pnl-row.final{background:#fff;color:#171a22}
+.theme-dark .feature-empty .big-icon{background:#25213d}
+.theme-toggle{font-size:16px}
+.active-toggle,.status-switch{width:38px;height:24px;border:1px solid transparent;border-radius:999px;display:inline-grid;place-items:center;font-weight:900;cursor:pointer;transition:.18s}
+.active-toggle.is-active,.status-switch.is-active{background:#13b981;color:#fff;border-color:#13b981}
+.active-toggle.is-inactive,.status-switch.is-inactive{background:#ef5b67;color:#fff;border-color:#ef5b67}
+.status-switch{width:auto;height:auto;padding:9px 13px;font-size:11px}
+.mobile-nav{display:none}
+@media(max-width:650px){
+  .topbar{min-height:76px;padding:13px 14px;position:sticky}
+  .topbar h2{font-size:20px}.topbar p{font-size:10px}
+  .top-actions{gap:6px}.top-actions .profile{display:grid}.theme-toggle{display:grid!important}
+  .content{padding:12px 12px 86px}
+  .panel{padding:14px;border-radius:14px}
+  .metric{padding:14px}.metric strong{font-size:22px}
+  .mobile-nav{display:flex;position:fixed;left:8px;right:8px;bottom:8px;height:62px;background:rgba(17,19,26,.96);border:1px solid rgba(255,255,255,.1);border-radius:18px;z-index:80;padding:5px;gap:3px;overflow-x:auto;box-shadow:0 15px 40px rgba(0,0,0,.25)}
+  .mobile-nav button{min-width:64px;flex:1;border:0;background:transparent;color:#9299aa;border-radius:13px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:8px;font-weight:750;white-space:nowrap}
+  .mobile-nav button i{font-style:normal;font-size:16px}.mobile-nav button.active{background:#6652df;color:#fff}
+  .table-wrap{margin:0 -2px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{min-width:760px}
+  .row-actions{position:sticky;right:0}
+  .modal-backdrop{padding:10px}.modal{width:100%;max-height:92vh;padding:17px;border-radius:17px}
+  .quick-add{flex-direction:column}.quick-add select,.quick-add button{width:100%}
+  .customer-order-head,.customer-order{grid-template-columns:80px 130px 90px 90px 90px;min-width:500px}
+}
+@media(min-width:651px) and (max-width:1000px){
+  .main{margin-left:80px}.content{padding:20px}
+  .topbar{padding:20px}
+}
