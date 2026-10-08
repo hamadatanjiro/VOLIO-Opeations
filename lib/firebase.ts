@@ -5,7 +5,7 @@ import { getDatabase } from "firebase/database";
 // Firebase web configuration. These values identify the public web app;
 // access is protected by Firebase Authentication and Realtime Database rules.
 const firebaseConfig = {
-  apiKey: "AIzaSyAdS8Gr18fTcrb_GnPbXn_eRxhgE6eCkwc",
+  apiKey: "AIzaSyAdS8GfcrB_GnPbXn_eRxhgE6cKcwC",
   authDomain: "volio-data.firebaseapp.com",
   databaseURL: "https://volio-data-default-rtdb.firebaseio.com",
   projectId: "volio-data",
