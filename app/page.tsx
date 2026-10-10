@@ -183,7 +183,7 @@ function App({ user, tab, setTab, data }: { user: User; tab: Tab; setTab: (t: Ta
     <main className="main">
       <header className="topbar"><div><div className="crumb">VOLIO / {title.toUpperCase()}</div><h2>{title}</h2><p>{subtitleText}</p></div><div className="top-actions"><span className="live"><i/> Live database</span><button type="button" className="icon-btn theme-toggle" title={darkMode ? "Switch to light mode" : "Switch to dark mode"} onClick={() => setDarkMode(v => !v)}>{darkMode ? "☀" : "☾"}</button><button className="icon-btn">⌕</button><button className="profile" onClick={() => setTab("settings")}>{(user.email?.[0] || "V").toUpperCase()}</button></div></header>
       <div className="content">
-        {tab === "dashboard" && <Dashboard revenue={revenue} cogs={cogs} expenses={operatingExpenses} net={net} orders={orders} expensesList={expenses} products={products} tasks={tasks} setTab={setTab} categories={expenseCategories}/>}
+        {tab === "dashboard" && <Dashboard revenue={revenue} cogs={cogs} expenses={operatingExpenses} net={net} orders={orders} expensesList={expenses} products={products} tasks={tasks} setTab={setTab} categories={expenseCategories} campaigns={data.campaigns || []}/>}
         {tab === "expenses" && <Expenses expenses={expenses} orders={orders} user={user} categories={expenseCategories} categoryRecords={data.expenseCategories || []}/>}
         {tab === "orders" && <Orders orders={orders} customers={customers} products={products} user={user}/>}
         {tab === "inventory" && <Inventory products={products} user={user}/>}
@@ -204,17 +204,20 @@ function App({ user, tab, setTab, data }: { user: User; tab: Tab; setTab: (t: Ta
   </div>;
 }
 
-function Dashboard({ revenue,cogs,expenses,net,orders,expensesList,products,tasks,setTab,categories }: any) {
+function Dashboard({ revenue,cogs,expenses,net,orders,expensesList,products,tasks,setTab,categories,campaigns }: any) {
   const recent = [...orders].sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt))).slice(0,5);
   const expensePalette=["#7563f6","#2f8cff","#f59e4a","#13b981","#d9dce5","#ef5b67","#0ea5a4","#a855f7"];
   // Combine Expenses entries with order-level delivery and box costs so the chart reflects all real outgoing costs.
   const orderDeliveryTotal=orders.reduce((sum:number,o:any)=>sum+Number(o.deliveryAmount ?? ((!o.expenseType&&o.expenses)?o.expenses:o.expenseType==="Delivery"?o.expenses:0) ?? 0),0);
   const orderBoxTotal=orders.reduce((sum:number,o:any)=>sum+Number(o.boxAmount ?? (o.expenseType==="Box"?o.expenses:0) ?? 0),0);
-  const expenseNames=Array.from(new Set([...categories,...expensesList.map((e:any)=>String(e.category||"Other")),"Delivery","Box"]));
+  const campaignAdSpend=(campaigns||[]).reduce((sum:number,c:any)=>sum+Number(c.spend||0),0);
+  const expenseNames=Array.from(new Set([...categories,...expensesList.map((e:any)=>String(e.category||"Other")),"Delivery","Box","Ads"]));
   const expenseBreakdown=expenseNames.map((name:string)=>{
     const recorded=expensesList.filter((e:any)=>String(e.category||"Other").toLowerCase()===name.toLowerCase()).reduce((sum:number,e:any)=>sum+Number(e.amount||0),0);
     const orderCosts=name.toLowerCase()==="delivery"?orderDeliveryTotal:name.toLowerCase()==="box"?orderBoxTotal:0;
-    return {name,total:recorded+orderCosts};
+    // Marketing campaign spend is also a real outgoing cost; include it in Ads even when no separate Ads expense entry exists.
+    const campaignCosts=name.toLowerCase()==="ads"?campaignAdSpend:0;
+    return {name,total:recorded+orderCosts+campaignCosts};
   }).filter((x:any)=>x.total>0).sort((a:any,b:any)=>b.total-a.total);
   const expenseMixTotal=expenseBreakdown.reduce((sum:number,x:any)=>sum+x.total,0);
   let expenseAngle=0;
