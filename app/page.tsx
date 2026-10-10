@@ -212,7 +212,6 @@ function App({ user, tab, setTab, data }: { user: User; tab: Tab; setTab: (t: Ta
 
 function Dashboard({ revenue,cogs,expenses,net,orders,expensesList,products,tasks,setTab,categories,campaigns }: any) {
   const recent = [...orders].sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt))).slice(0,5);
-  const recent = [...orders].sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt))).slice(0,5);
   const expensePalette=["#7563f6","#2f8cff","#f59e4a","#13b981","#d9dce5","#ef5b67","#0ea5a4","#a855f7"];
   // Unified expense ledger: every expense record, delivery/box from orders, and both past + current ad spend.
   const expenseTotals:Record<string,number>={};
