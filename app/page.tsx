@@ -156,7 +156,13 @@ function App({ user, tab, setTab, data }: { user: User; tab: Tab; setTab: (t: Ta
   const cogs = orders.reduce((s, x) => s + Number(x.cogs || 0), 0);
   const gross = revenue - cogs;
   const expenseTotal = expenses.reduce((s, x) => s + Number(x.amount || 0), 0);
-  const orderDirectExpenses = orders.reduce((s, x) => s + Number(x.expenses || 0), 0);
+  // One unified expense total: expense records + order delivery/box + all marketing campaign spend.
+  const orderDirectExpenses = orders.reduce((sum:any, o:any) => {
+    const splitCostsExist = o.deliveryAmount != null || o.boxAmount != null;
+    return sum + (splitCostsExist
+      ? Number(o.deliveryAmount || 0) + Number(o.boxAmount || 0)
+      : Number(o.expenses || 0));
+  }, 0);
   const marketingSpend = (data.campaigns || []).reduce((s, x) => s + Number(x.spend || 0), 0);
   const operatingExpenses = expenseTotal + orderDirectExpenses + marketingSpend;
   const net = gross - operatingExpenses;
@@ -206,22 +212,29 @@ function App({ user, tab, setTab, data }: { user: User; tab: Tab; setTab: (t: Ta
 
 function Dashboard({ revenue,cogs,expenses,net,orders,expensesList,products,tasks,setTab,categories,campaigns }: any) {
   const recent = [...orders].sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt))).slice(0,5);
+  const recent = [...orders].sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt))).slice(0,5);
   const expensePalette=["#7563f6","#2f8cff","#f59e4a","#13b981","#d9dce5","#ef5b67","#0ea5a4","#a855f7"];
-  // Combine Expenses entries with order-level delivery and box costs so the chart reflects all real outgoing costs.
-  const orderDeliveryTotal=orders.reduce((sum:number,o:any)=>sum+Number(o.deliveryAmount ?? ((!o.expenseType&&o.expenses)?o.expenses:o.expenseType==="Delivery"?o.expenses:0) ?? 0),0);
-  const orderBoxTotal=orders.reduce((sum:number,o:any)=>sum+Number(o.boxAmount ?? (o.expenseType==="Box"?o.expenses:0) ?? 0),0);
+  // Unified expense ledger: every expense record, delivery/box from orders, and both past + current ad spend.
+  const expenseTotals:Record<string,number>={};
+  const addExpense=(name:string,amount:number)=>{const key=String(name||"Other").trim()||"Other";expenseTotals[key]=(expenseTotals[key]||0)+(Number(amount)||0)};
+  expensesList.forEach((e:any)=>addExpense(e.category||"Other",Number(e.amount||0)));
+  orders.forEach((o:any)=>{
+    const hasSplit=o.deliveryAmount!=null||o.boxAmount!=null;
+    if(hasSplit){
+      addExpense("Delivery",Number(o.deliveryAmount||0));
+      addExpense("Box",Number(o.boxAmount||0));
+    }else if(Number(o.expenses||0)>0){
+      if(o.expenseType==="Delivery")addExpense("Delivery",Number(o.expenses||0));
+      else if(o.expenseType==="Box")addExpense("Box",Number(o.expenses||0));
+      else addExpense("Order expenses",Number(o.expenses||0));
+    }
+  });
   const campaignAdSpend=(campaigns||[]).reduce((sum:number,c:any)=>sum+Number(c.spend||0),0);
-  const expenseNames=Array.from(new Set([...categories,...expensesList.map((e:any)=>String(e.category||"Other")),"Delivery","Box","Ads"]));
-  const expenseBreakdown=expenseNames.map((name:string)=>{
-    const recorded=expensesList.filter((e:any)=>String(e.category||"Other").toLowerCase()===name.toLowerCase()).reduce((sum:number,e:any)=>sum+Number(e.amount||0),0);
-    const orderCosts=name.toLowerCase()==="delivery"?orderDeliveryTotal:name.toLowerCase()==="box"?orderBoxTotal:0;
-    // Marketing campaign spend is also a real outgoing cost; include it in Ads even when no separate Ads expense entry exists.
-    const campaignCosts=name.toLowerCase()==="ads"?campaignAdSpend:0;
-    return {name,total:recorded+orderCosts+campaignCosts};
-  }).filter((x:any)=>x.total>0).sort((a:any,b:any)=>b.total-a.total);
-  const expenseMixTotal=expenseBreakdown.reduce((sum:number,x:any)=>sum+x.total,0);
+  if(campaignAdSpend>0)addExpense("Ads",campaignAdSpend);
+  const expenseBreakdown=Object.entries(expenseTotals).map(([name,total])=>({name,total:Number(total)})).filter(x=>x.total>0).sort((a,b)=>b.total-a.total);
+  const expenseMixTotal=expenseBreakdown.reduce((sum,x)=>sum+x.total,0);
   let expenseAngle=0;
-  const expenseGradient=expenseMixTotal>0?expenseBreakdown.map((x:any,i:number)=>{const start=expenseAngle;expenseAngle+=x.total/expenseMixTotal*100;return `${expensePalette[i%expensePalette.length]} ${start}% ${expenseAngle}%`}).join(", "):"#e8eaf0 0 100%";
+  const expenseGradient=expenseMixTotal>0?expenseBreakdown.map((x,i)=>{const start=expenseAngle;expenseAngle+=x.total/expenseMixTotal*100;return `${expensePalette[i%expensePalette.length]} ${start}% ${expenseAngle}%`}).join(", "):"#e8eaf0 0 100%";
   return <div className="stack">
     <div className="health-banner"><div><span className="pill green">● Healthy</span><h3>VOLIO is under control.</h3><p>Keep expenses tight and turn every confirmed order into measurable profit.</p></div><button type="button" className="secondary" onClick={()=>setTab("expenses")}>Review expenses →</button></div>
     <div className="metric-grid">
