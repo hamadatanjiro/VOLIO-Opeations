@@ -206,6 +206,11 @@ function App({ user, tab, setTab, data }: { user: User; tab: Tab; setTab: (t: Ta
 
 function Dashboard({ revenue,cogs,expenses,net,orders,expensesList,products,tasks,setTab,categories }: any) {
   const recent = [...orders].sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt))).slice(0,5);
+  const expensePalette=["#7563f6","#2f8cff","#f59e4a","#13b981","#d9dce5","#ef5b67","#0ea5a4","#a855f7"];
+  const expenseBreakdown=Array.from(new Set([...categories,...expensesList.map((e:any)=>String(e.category||"Other"))])).map((name:string)=>({name,total:expensesList.filter((e:any)=>String(e.category||"Other").toLowerCase()===name.toLowerCase()).reduce((sum:number,e:any)=>sum+Number(e.amount||0),0)})).filter((x:any)=>x.total>0).sort((a:any,b:any)=>b.total-a.total);
+  const expenseMixTotal=expenseBreakdown.reduce((sum:number,x:any)=>sum+x.total,0);
+  let expenseAngle=0;
+  const expenseGradient=expenseMixTotal>0?expenseBreakdown.map((x:any,i:number)=>{const start=expenseAngle;expenseAngle+=x.total/expenseMixTotal*100;return `${expensePalette[i%expensePalette.length]} ${start}% ${expenseAngle}%`}).join(", "):"#e8eaf0 0 100%";
   return <div className="stack">
     <div className="health-banner"><div><span className="pill green">● Healthy</span><h3>VOLIO is under control.</h3><p>Keep expenses tight and turn every confirmed order into measurable profit.</p></div><button type="button" className="secondary" onClick={()=>setTab("expenses")}>Review expenses →</button></div>
     <div className="metric-grid">
@@ -216,7 +221,7 @@ function Dashboard({ revenue,cogs,expenses,net,orders,expensesList,products,task
     </div>
     <div className="two-col">
       <section className="panel"><PanelHead title="Performance" action="Last 30 days"/><div className="fake-chart"><div className="chart-line"/>{[18,35,28,48,42,63,57,72,66,84,78,92].map((h,i)=><div className="bar" style={{height:`${h}%`}} key={i}/>)}</div><div className="chart-foot"><span>Revenue</span><b>{money(revenue)}</b><span>Net</span><b>{money(net)}</b></div></section>
-      <section className="panel"><PanelHead title="Expense mix" action="This period"/><div className="donut"><div className="donut-hole"><b>{money(expenses)}</b><small>Total</small></div></div><div className="legend">{categories.slice(0,5).map((c:string,i:number)=><div key={c}><i className={`dot d${i}`}/>{c}<b>{money(expensesList.filter((e:any)=>e.category===c).reduce((s:number,e:any)=>s+Number(e.amount||0),0))}</b></div>)}</div></section>
+      <section className="panel"><PanelHead title="Expense mix" action="This period"/><div className="donut" style={{background:`conic-gradient(${expenseGradient})`}}><div className="donut-hole"><b>{money(expenseMixTotal)}</b><small>Total expenses</small></div></div><div className="legend">{expenseBreakdown.length?expenseBreakdown.map((item:any,i:number)=><div key={item.name}><i className="dot" style={{background:expensePalette[i%expensePalette.length]}}/>{item.name}<b>{money(item.total)}</b></div>):<Empty text="No expenses recorded yet."/>}</div></section>
     </div>
     <div className="two-col">
       <section className="panel"><PanelHead title="Recent orders" action="View all" onClick={()=>setTab("orders")}/><Table headers={["Customer","Model","Sale","Profit"]} rows={recent.map((o:any)=>[o.customer||"—",o.model||"—",money(o.sale),money(Number(o.sale||0)-Number(o.cogs||0)-Number(o.expenses||0))])}/>{!recent.length&&<Empty text="No orders yet. Add your first sale."/ >}</section>
