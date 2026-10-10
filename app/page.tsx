@@ -207,7 +207,15 @@ function App({ user, tab, setTab, data }: { user: User; tab: Tab; setTab: (t: Ta
 function Dashboard({ revenue,cogs,expenses,net,orders,expensesList,products,tasks,setTab,categories }: any) {
   const recent = [...orders].sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt))).slice(0,5);
   const expensePalette=["#7563f6","#2f8cff","#f59e4a","#13b981","#d9dce5","#ef5b67","#0ea5a4","#a855f7"];
-  const expenseBreakdown=Array.from(new Set([...categories,...expensesList.map((e:any)=>String(e.category||"Other"))])).map((name:string)=>({name,total:expensesList.filter((e:any)=>String(e.category||"Other").toLowerCase()===name.toLowerCase()).reduce((sum:number,e:any)=>sum+Number(e.amount||0),0)})).filter((x:any)=>x.total>0).sort((a:any,b:any)=>b.total-a.total);
+  // Combine Expenses entries with order-level delivery and box costs so the chart reflects all real outgoing costs.
+  const orderDeliveryTotal=orders.reduce((sum:number,o:any)=>sum+Number(o.deliveryAmount ?? ((!o.expenseType&&o.expenses)?o.expenses:o.expenseType==="Delivery"?o.expenses:0) ?? 0),0);
+  const orderBoxTotal=orders.reduce((sum:number,o:any)=>sum+Number(o.boxAmount ?? (o.expenseType==="Box"?o.expenses:0) ?? 0),0);
+  const expenseNames=Array.from(new Set([...categories,...expensesList.map((e:any)=>String(e.category||"Other")),"Delivery","Box"]));
+  const expenseBreakdown=expenseNames.map((name:string)=>{
+    const recorded=expensesList.filter((e:any)=>String(e.category||"Other").toLowerCase()===name.toLowerCase()).reduce((sum:number,e:any)=>sum+Number(e.amount||0),0);
+    const orderCosts=name.toLowerCase()==="delivery"?orderDeliveryTotal:name.toLowerCase()==="box"?orderBoxTotal:0;
+    return {name,total:recorded+orderCosts};
+  }).filter((x:any)=>x.total>0).sort((a:any,b:any)=>b.total-a.total);
   const expenseMixTotal=expenseBreakdown.reduce((sum:number,x:any)=>sum+x.total,0);
   let expenseAngle=0;
   const expenseGradient=expenseMixTotal>0?expenseBreakdown.map((x:any,i:number)=>{const start=expenseAngle;expenseAngle+=x.total/expenseMixTotal*100;return `${expensePalette[i%expensePalette.length]} ${start}% ${expenseAngle}%`}).join(", "):"#e8eaf0 0 100%";
